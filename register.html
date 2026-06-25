@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>注册 · Moduscript 模词成稿</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1 class="auth-title">注册 Moduscript</h1>
+    <p class="auth-subtitle"> </p>
+    <form id="registerForm" class="auth-form">
+      <label class="auth-label">用户名<input type="text" id="username" required autocomplete="username" minlength="2" maxlength="32" placeholder="2–32 个字符，字母/数字/下划线/中文"></label>
+      <label class="auth-label">邮箱（可选）<input type="email" id="email" autocomplete="email" placeholder="可留空"></label>
+      <label class="auth-label">密码<input type="password" id="password" required autocomplete="new-password" minlength="6" placeholder="至少 6 位"></label>
+      <button type="submit" class="btn btn-primary auth-submit">注册</button>
+    </form>
+    <p class="auth-footer">已有账号？<a href="/login.html">登录</a></p>
+  </main>
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { register } from './js/auth.js';
+
+    function showToast(msg, type = 'info') {
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        await register(username, email, password);
+        window.location.href = '/index.html';
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

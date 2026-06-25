@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no" class="page-home">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Moduscript 模词成稿 — 模组 Agent 提示词自动成稿，告别繁琐 prompt 拼装">
+  <meta name="google" content="notranslate">
+  <title>Moduscript 模词成稿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=36">
+</head>
+<body class="page-home">
+  <div class="app-layout" id="appLayout">
+    <!-- 统一侧栏：对话列表 + 构想列表 -->
+    <aside class="history-panel unified-sidebar" id="sessionListPanel" aria-label="侧栏" hidden>
+      <div class="sidebar-section sidebar-section--sessions">
+        <div class="history-panel-header">
+          <h2 class="history-panel-title" id="sessionListPanelTitle">对话列表</h2>
+          <button type="button" class="btn btn-outline btn-sm" id="conceptNewBtn">新建构想</button>
+        </div>
+        <div class="history-panel-body" id="sessionListPanelBody">
+          <p class="history-panel-empty">暂无记录</p>
+        </div>
+        <div class="history-panel-footer">
+          <button type="button" class="btn btn-outline btn-sm history-panel-recycle-btn" id="sessionListRecycleBtn">回收站</button>
+        </div>
+      </div>
+    </aside>
+    <div class="history-backdrop" id="historyBackdrop" hidden aria-hidden="true"></div>
+
+    <div class="main-column">
+      <!-- 顶栏 -->
+      <header class="top-bar home-top-bar">
+        <button
+          type="button"
+          class="top-bar-btn history-toggle"
+          id="historyToggle"
+          aria-expanded="false"
+          aria-controls="sessionListPanel"
+        >
+          <svg class="history-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+          <span class="top-bar-btn-label">对话列表</span>
+          <svg class="history-toggle-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <div class="top-bar-spacer"></div>
+        <div class="top-bar-actions">
+          <div class="nav-dropdown" data-nav-dropdown="tools">
+            <button type="button" class="top-bar-btn nav-dropdown-trigger" id="toolsMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="toolsMenu">
+              <span class="top-bar-btn-label">其他工具</span>
+              <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="nav-dropdown-menu" id="toolsMenu" role="menu" aria-labelledby="toolsMenuTrigger" hidden>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-search">模组查找</button></li>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-source">模组源码分析</button></li>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-redev">模组二次开发</button></li>
+            </ul>
+          </div>
+          <div class="nav-dropdown" data-nav-dropdown="help">
+            <button type="button" class="top-bar-btn nav-dropdown-trigger" id="helpMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="helpMenu">
+              <span class="top-bar-btn-label">帮助&amp;客服</span>
+              <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="nav-dropdown-menu" id="helpMenu" role="menu" aria-labelledby="helpMenuTrigger" hidden>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="help-docs">使用说明</button></li>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="help-support">联系客服</button></li>
+            </ul>
+          </div>
+          <div class="nav-dropdown" data-nav-dropdown="lang">
+            <button type="button" class="top-bar-btn nav-dropdown-trigger" id="langMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="langMenu">
+              <span class="top-bar-btn-label">语言切换</span>
+              <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="nav-dropdown-menu" id="langMenu" role="menu" aria-labelledby="langMenuTrigger" hidden>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="lang-zh" aria-current="true">简体中文</button></li>
+              <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="lang-en">English</button></li>
+            </ul>
+          </div>
+          <div class="top-bar-account-col">
+            <button type="button" class="btn-icon theme-toggle" id="themeToggle" aria-label="切换主题">
+              <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+              <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+            </button>
+            <a class="account-status" id="accountStatus" href="/login.html">游客，请登录</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="landing">
+          <h1 class="landing-title">「Moduscript 模词成稿」</h1>
+          <p class="landing-subtitle">将构想、环境、参考汇成Agent prompt任务稿 · 轻松生成 · 自由调整</p>
+
+          <form class="prompt-form" id="promptForm" novalidate>
+            <!-- MC 版本、加载器、平台 -->
+            <div class="selectors-row">
+              <div class="dropdown" data-dropdown="mcVersion">
+                <label class="dropdown-label" id="mcVersionLabel">MC 版本</label>
+                <button type="button" class="dropdown-trigger" id="mcVersionTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="mcVersionLabel mcVersionValue">
+                  <span class="dropdown-value" id="mcVersionValue">1.20.1</span>
+                  <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <ul class="dropdown-menu" id="mcVersionMenu" role="listbox" aria-labelledby="mcVersionLabel" hidden></ul>
+              </div>
+
+              <div class="dropdown" data-dropdown="modLoader">
+                <label class="dropdown-label" id="modLoaderLabel">模组&amp;插件加载器</label>
+                <button type="button" class="dropdown-trigger" id="modLoaderTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="modLoaderLabel modLoaderValue">
+                  <span class="dropdown-value" id="modLoaderValue">Fabric</span>
+                  <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <ul class="dropdown-menu" id="modLoaderMenu" role="listbox" aria-labelledby="modLoaderLabel" hidden></ul>
+              </div>
+
+              <div class="dropdown" data-dropdown="platform">
+                <label class="dropdown-label" id="platformLabel">平台</label>
+                <button type="button" class="dropdown-trigger" id="platformTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="platformLabel platformValue">
+                  <span class="dropdown-value" id="platformValue">不指定</span>
+                  <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <ul class="dropdown-menu" id="platformMenu" role="listbox" aria-labelledby="platformLabel" hidden></ul>
+              </div>
+            </div>
+
+            <!-- 主输入 -->
+            <div class="textarea-wrap" id="textareaWrap">
+              <div class="prompt-textarea-host">
+                <textarea
+                  id="promptInput"
+                  class="prompt-textarea"
+                  name="prompt"
+                  placeholder="描述您的 Mod 构想..."
+                  rows="6"
+                  required
+                  minlength="10"
+                ></textarea>
+                <button
+                  type="button"
+                  class="prompt-textarea-resize"
+                  id="promptTextareaResize"
+                  aria-label="拖动调整输入框高度"
+                  tabindex="-1"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="16" r="1.5"/><circle cx="16" cy="12" r="1.5"/></svg>
+                </button>
+              </div>
+              <div class="prompt-input-footer">
+                <button type="button" class="btn btn-outline btn-sm optimize-desc-btn" id="optimizeDescBtn">
+                  <span class="optimize-desc-btn-label">优化描述</span>
+                  <span class="optimize-desc-btn-loading" id="optimizeDescLoading" hidden aria-hidden="true">
+                    <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  </span>
+                </button>
+                <div class="prompt-actions-slot" id="promptActionsSlot">
+                  <div class="prompt-actions" id="promptActions">
+                    <button type="button" class="btn btn-outline btn-action prompt-preview-btn" id="promptPreviewBtn">最终提示词预览</button>
+                    <button type="button" class="btn btn-primary btn-action" id="startPlanBtn">开始规划</button>
+                    <button type="button" class="btn btn-primary btn-action" id="startBuildBtn" disabled>开始编写</button>
+                    <span class="prompt-actions-loading" id="submitLoading" hidden aria-hidden="true">
+                      <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="desc-optimize-panel" id="descOptimizePanel" hidden>
+                <button
+                  type="button"
+                  class="desc-optimize-header"
+                  id="descOptimizeCollapseBtn"
+                  aria-expanded="true"
+                  aria-controls="descOptimizeBody"
+                >
+                  <svg class="desc-optimize-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span>优化结果</span>
+                </button>
+                <div class="desc-optimize-body" id="descOptimizeBody">
+                  <div class="desc-optimize-md markdown-body" id="descOptimizeContent"></div>
+                </div>
+                <div class="desc-optimize-footer">
+                  <div class="desc-optimize-adopt" id="descOptimizeAdopt">
+                    <button type="button" class="btn btn-outline btn-sm" id="adoptDescBtn">采纳到输入框</button>
+                    <div class="desc-optimize-adopt-confirm" id="adoptDescConfirm" hidden>
+                      <button type="button" class="btn btn-primary btn-sm" id="adoptDescConfirmBtn">确认采纳</button>
+                      <button type="button" class="btn btn-outline btn-sm" id="adoptDescCancelBtn">取消</button>
+                    </div>
+                  </div>
+                  <div class="prompt-actions-slot desc-optimize-actions-slot" id="descOptimizeActionsSlot"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 其他要求 -->
+            <section class="requirements-section" aria-labelledby="requirementsHeading">
+              <div class="requirements-header">
+                <h2 class="requirements-heading" id="requirementsHeading">其他要求</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="requirementsConfigBtn">配置</button>
+              </div>
+              <div class="requirements-grid" id="requirementsGrid" role="group" aria-label="其他要求选项"></div>
+            </section>
+
+            <!-- 参考模组 -->
+            <section class="ref-mods-section" id="referenceModsSection" aria-labelledby="referenceModsHeading">
+              <div class="requirements-header">
+                <h2 class="requirements-heading" id="referenceModsHeading">参考模组</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="referenceModsToggle" aria-expanded="true" aria-controls="referenceModsBody">
+                  收起
+                </button>
+              </div>
+              <div class="ref-mods-body" id="referenceModsBody">
+                <div class="ref-mods-input-row">
+                  <input
+                    type="text"
+                    id="referenceModInput"
+                    class="form-input ref-mods-input"
+                    placeholder="https://modrinth.com/project/OhduvhIc"
+                    autocomplete="off"
+                  >
+                  <button type="button" class="btn btn-sm ref-mod-btn--code" id="referenceModCodeBtn">参考代码</button>
+                  <button type="button" class="btn btn-sm ref-mod-btn--feature" id="referenceModFeatureBtn">参考功能</button>
+                </div>
+                <div class="ref-mod-chips" id="referenceModChips" role="list" aria-label="已添加的参考模组"></div>
+                <label class="ref-mods-auto">
+                  <input type="checkbox" id="referenceModAutoSearch">
+                  <span>额外让 Agent 在 Modrinth 搜索相关模组</span>
+                </label>
+                <p class="ref-mods-auto-hint">将根据上方 Mod 描述与当前 MC 版本、加载器检索</p>
+              </div>
+            </section>
+
+            <!-- 高级设置 -->
+            <section class="requirements-section" id="advancedSettingsSection" aria-labelledby="advancedSettingsHeading">
+              <div class="requirements-header">
+                <h2 class="requirements-heading" id="advancedSettingsHeading">高级设置</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="advancedSettingsToggle" aria-expanded="false" aria-controls="advancedSettingsBody">展开</button>
+              </div>
+              <div class="ref-mods-body" id="advancedSettingsBody" hidden>
+                <div class="form-field mod-meta-field" data-mod-meta-field="modName">
+                  <label for="advancedModName">Mod 名称 <span class="form-hint">（选填，英文 2–40 字符，留空则自动生成）</span></label>
+                  <input type="text" id="advancedModName" class="form-input" maxlength="40" placeholder="如 Example Guilds" autocomplete="off" spellcheck="false">
+                  <span class="form-field-error" id="advancedModNameError" hidden></span>
+                </div>
+                <div class="form-field mod-meta-field" data-mod-meta-field="modId">
+                  <label for="advancedModId">Mod ID <span class="form-hint">（选填，世界唯一，不允许大写字母）</span></label>
+                  <input type="text" id="advancedModId" class="form-input" maxlength="32" placeholder="如 dhz_guilds" autocomplete="off" spellcheck="false">
+                  <span class="form-field-error" id="advancedModIdError" hidden></span>
+                </div>
+                <div class="form-field mod-meta-field" data-mod-meta-field="packageName">
+                  <label for="advancedPackageName">包名 <span class="form-hint">（选填，推荐格式：{域名}.{作者}.{modID}）</span></label>
+                  <input type="text" id="advancedPackageName" class="form-input" maxlength="80" placeholder="如 com.example.my_guilds" autocomplete="off" spellcheck="false">
+                  <span class="form-field-error" id="advancedPackageNameError" hidden></span>
+                </div>
+                <div class="advanced-build-settings" id="advancedBuildSettings">
+                  <h3 class="advanced-subsection-heading">编写模式设置</h3>
+                  <div class="form-field">
+                    <label>打扰强度</label>
+                    <div class="interrupt-picker-grid interrupt-picker-grid--inline" id="advancedInterruptOptions" role="group" aria-label="打扰强度"></div>
+                  </div>
+                  <div class="form-field">
+                    <label for="advancedMaxTurns">最大工具调用次数 <span class="form-hint">（Agent 轮次上限，默认 150）</span></label>
+                    <input type="number" id="advancedMaxTurns" class="form-input" min="10" max="500" step="10" value="150" autocomplete="off">
+                    <span class="form-field-error" id="advancedMaxTurnsError" hidden></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </form>
+        </div>
+
+        <footer class="site-footer">
+          <p class="footer-disclaimer">非 Minecraft 官方产品。未获 Mojang 许可，亦与 Mojang 无任何关联。</p>
+          <p class="footer-copy">&copy; 2026 Moduscript 模词成稿</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- 要求项说明气泡 -->
+  <div class="req-popover" id="requirementPopover" role="tooltip" hidden>
+    <div class="req-popover-arrow" aria-hidden="true"></div>
+    <div class="req-popover-head">
+      <p class="req-popover-title" id="requirementPopoverTitle"></p>
+      <span class="req-popover-cost" id="requirementPopoverCost" hidden></span>
+    </div>
+    <p class="req-popover-body" id="requirementPopoverBody"></p>
+  </div>
+
+  <!-- 参考模组详情气泡 -->
+  <div class="req-popover req-popover--interactive" id="refModPopover" role="tooltip" hidden>
+    <div class="req-popover-arrow" aria-hidden="true"></div>
+    <p class="req-popover-title" id="refModPopoverTitle"></p>
+    <div class="req-popover-body" id="refModPopoverBody"></div>
+  </div>
+
+  <!-- 规划深度选择气泡 -->
+  <div class="req-popover req-popover--interactive plan-depth-popover" id="planDepthPopover" role="dialog" aria-label="选择规划深度" hidden>
+    <div class="req-popover-arrow" aria-hidden="true"></div>
+    <p class="req-popover-title">选择规划深度</p>
+    <div class="req-popover-body plan-depth-options" id="planDepthOptions" role="group" aria-label="规划深度"></div>
+  </div>
+
+  <!-- Toast 通知 -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- 最终提示词预览 -->
+  <div class="modal-overlay" id="promptPreviewOverlay" hidden>
+    <div
+      class="modal modal--wide"
+      id="promptPreviewModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="promptPreviewModalTitle"
+    >
+      <div class="modal-header">
+        <h2 class="modal-title" id="promptPreviewModalTitle">最终提示词预览</h2>
+        <button type="button" class="modal-close" id="promptPreviewClose" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <pre class="prompt-preview-content" id="promptPreviewContent"></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="promptPreviewDone">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他要求配置弹窗 -->
+  <div class="modal-overlay" id="requirementsModalOverlay" hidden>
+    <div
+      class="modal"
+      id="requirementsModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="requirementsModalTitle"
+    >
+      <div class="modal-header">
+        <h2 class="modal-title" id="requirementsModalTitle">配置其他要求</h2>
+        <button type="button" class="modal-close" id="requirementsModalClose" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <section class="modal-section">
+          <div class="modal-section-head">
+            <h3 class="modal-section-title">要求列表</h3>
+            <button type="button" class="btn btn-outline btn-sm" id="resetCustomReqBtn">恢复默认</button>
+          </div>
+          <p class="modal-req-sort-hint" id="reqListSortHint">拖动左侧手柄可调整顺序</p>
+          <ul class="modal-req-list" id="reqList"></ul>
+          <p class="modal-empty" id="reqListEmpty" hidden>暂无要求项，可在下方添加。</p>
+        </section>
+        <section class="modal-section modal-form-section">
+          <h3 class="modal-section-title" id="customFormTitle">添加要求</h3>
+          <input type="hidden" id="customFormEditId" value="">
+          <div class="form-field">
+            <label for="customReqTitle">标题 <span class="form-hint">（最多 8 个汉字）</span></label>
+            <input type="text" id="customReqTitle" class="form-input" maxlength="32" placeholder="例如：多语言支持">
+            <span class="form-counter" id="customReqTitleCounter">0/8 汉字</span>
+          </div>
+          <div class="form-field">
+            <label for="customReqDescription">详细说明</label>
+            <textarea id="customReqDescription" class="form-textarea" rows="3" placeholder="展开后向用户展示的说明…"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="customReqPrompt">Agent 指令 <span class="form-hint">（可选，留空则使用详细说明代替）</span></label>
+            <textarea id="customReqPrompt" class="form-textarea" rows="2" placeholder="供 Agent 理解的额外约束…"></textarea>
+          </div>
+          <div class="modal-form-actions">
+            <button type="button" class="btn btn-outline" id="customFormCancelBtn" hidden>取消编辑</button>
+            <button type="button" class="btn btn-primary" id="customFormSaveBtn">添加</button>
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="requirementsModalDone">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-modal-overlay" id="homeL1Overlay" hidden>
+    <div class="plan-modal" role="dialog" aria-labelledby="homeL1Title">
+      <h2 class="plan-modal-title" id="homeL1Title">知识水平（L1 四维粗评）</h2>
+      <div class="plan-modal-body" id="homeL1Body"></div>
+      <div class="plan-modal-actions">
+        <button type="button" class="btn btn-outline" id="homeL1Cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="homeL1Confirm">确认并开始规划</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

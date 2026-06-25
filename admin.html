@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理后台 · Moduscript</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="top-bar">
+    <a class="top-bar-btn" href="/index.html">← 返回站点</a>
+    <div class="top-bar-spacer"></div>
+    <button type="button" class="top-bar-btn" id="adminLogoutBtn" hidden>退出后台</button>
+  </header>
+
+  <main class="admin-page">
+    <section class="admin-section admin-login-section" id="adminLoginSection">
+      <h1>管理后台</h1>
+      <p class="settings-hint">请通过手动输入链接访问本页。输入管理口令后继续。</p>
+      <form id="adminLoginForm" class="admin-form">
+        <label>管理口令<input type="password" id="adminPassword" required autocomplete="current-password"></label>
+        <button type="submit" class="btn btn-primary">进入后台</button>
+      </form>
+    </section>
+
+    <div id="adminPanelContent" hidden>
+      <h1>管理后台</h1>
+      <section class="admin-section" id="overviewSection">
+        <h2>概览</h2>
+        <div class="admin-stats" id="adminStats">加载中…</div>
+      </section>
+      <section class="admin-section" id="adminLlmTabsSection">
+        <h2>LLM 配置</h2>
+        <div class="admin-llm-profiles" id="llmProfilesBar">
+          <p class="settings-hint" id="llmProfilesHint">加载预设…</p>
+          <div class="admin-llm-profile-chips" id="llmProfileChips"></div>
+          <div class="admin-llm-profile-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="llmProfileSaveAsBtn">另存为预设</button>
+            <button type="button" class="btn btn-outline btn-sm" id="llmProfileRenameBtn">重命名</button>
+            <button type="button" class="btn btn-outline btn-sm" id="llmProfileDeleteBtn">删除</button>
+          </div>
+        </div>
+        <div class="admin-llm-tabs" role="tablist">
+          <button type="button" class="admin-llm-tab is-active" data-llm-tab="adminLlmShared" role="tab">统一 LLM <span class="admin-llm-tab-badge" data-hint-for="llmStatusHint"></span></button>
+          <button type="button" class="admin-llm-tab" data-llm-tab="adminPromptOptimize" role="tab">描述优化 <span class="admin-llm-tab-badge" data-hint-for="promptOptimizeStatusHint"></span></button>
+          <button type="button" class="admin-llm-tab" data-llm-tab="adminModNameSuggest" role="tab">Mod 名称 <span class="admin-llm-tab-badge" data-hint-for="modNameSuggestStatusHint"></span></button>
+          <button type="button" class="admin-llm-tab" data-llm-tab="adminPlanLlm" role="tab">规划 LLM <span class="admin-llm-tab-badge" data-hint-for="planLlmStatusHint"></span></button>
+        </div>
+        <div class="admin-llm-tab-panel is-active" id="adminLlmShared" role="tabpanel">
+          <h3 class="admin-llm-panel-title">统一 LLM API 配置</h3>
+          <p class="settings-hint" id="llmStatusHint"></p>
+          <form id="llmForm" class="admin-form">
+            <label>Base URL<input type="url" id="llmBaseUrl" placeholder="https://api.anthropic.com"></label>
+            <label>API Key<input type="password" id="llmApiKey" placeholder="留空则不修改已有 Key"></label>
+            <label>Model<input type="text" id="llmModel" placeholder="claude-sonnet-4-20250514"></label>
+            <label>Subagent Model<input type="text" id="llmSubagent"></label>
+            <button type="submit" class="btn btn-primary">保存 LLM 配置</button>
+          </form>
+        </div>
+        <div class="admin-llm-tab-panel" id="adminPromptOptimize" role="tabpanel" hidden>
+          <h3 class="admin-llm-panel-title">描述优化配置</h3>
+          <p class="settings-hint" id="promptOptimizeStatusHint"></p>
+          <form id="promptOptimizeForm" class="admin-form">
+            <label><input type="checkbox" id="promptOptimizeEnabled"> 启用描述优化</label>
+            <label>Base URL<input type="url" id="promptOptimizeBaseUrl" placeholder="https://api.deepseek.com"></label>
+            <label>API Key<input type="password" id="promptOptimizeApiKey" placeholder="留空则不修改已有 Key"></label>
+            <label>Model<input type="text" id="promptOptimizeModel" placeholder="deepseek-v4-pro"></label>
+            <label>System Prompt<textarea id="promptOptimizeSystemPrompt" rows="3"></textarea></label>
+            <label>Reasoning Effort
+              <select id="promptOptimizeReasoningEffort">
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+            <label><input type="checkbox" id="promptOptimizeThinkingEnabled"> 启用 Thinking</label>
+            <button type="submit" class="btn btn-primary">保存描述优化配置</button>
+          </form>
+        </div>
+        <div class="admin-llm-tab-panel" id="adminModNameSuggest" role="tabpanel" hidden>
+          <h3 class="admin-llm-panel-title">Mod 名称生成配置</h3>
+          <p class="settings-hint" id="modNameSuggestStatusHint"></p>
+          <form id="modNameSuggestForm" class="admin-form">
+            <label><input type="checkbox" id="modNameSuggestEnabled"> 启用 Mod 名称自动生成（LLM）</label>
+            <label>Base URL<input type="url" id="modNameSuggestBaseUrl" placeholder="https://api.deepseek.com"></label>
+            <label>API Key<input type="password" id="modNameSuggestApiKey" placeholder="留空则不修改已有 Key"></label>
+            <label>Model<input type="text" id="modNameSuggestModel" placeholder="deepseek-chat"></label>
+            <label>System Prompt<textarea id="modNameSuggestSystemPrompt" rows="4"></textarea></label>
+            <label>Temperature<input type="number" id="modNameSuggestTemperature" min="0" max="2" step="0.1" value="0.3"></label>
+            <button type="submit" class="btn btn-primary">保存 Mod 名称生成配置</button>
+          </form>
+        </div>
+        <div class="admin-llm-tab-panel" id="adminPlanLlm" role="tabpanel" hidden>
+          <h3 class="admin-llm-panel-title">规划模式 LLM 配置</h3>
+          <p class="settings-hint" id="planLlmStatusHint"></p>
+          <p class="settings-hint" id="planRefDecompileHint">闭源参考反编译工具（Vineflower / tiny-remapper）在首次索引或 setup 时自动下载，需 Java 17+ 与网络；失败时可重试索引或跳过等待先规划。</p>
+          <form id="planLlmForm" class="admin-form">
+            <label><input type="checkbox" id="planLlmEnabled"> 启用规划模式 LLM</label>
+            <label>Base URL<input type="url" id="planLlmBaseUrl" placeholder="https://api.deepseek.com"></label>
+            <label>API Key<input type="password" id="planLlmApiKey" placeholder="留空则不修改已有 Key"></label>
+            <label>Model<input type="text" id="planLlmModel" placeholder="deepseek-chat"></label>
+            <label>System Prompt（出题轮次）<textarea id="planLlmSystemPrompt" rows="3"></textarea></label>
+            <label>Finalize System Prompt（定稿轮次）<textarea id="planLlmFinalizeSystemPrompt" rows="3"></textarea></label>
+            <label>Temperature<input type="number" id="planLlmTemperature" min="0" max="2" step="0.1" value="0.4"></label>
+            <button type="submit" class="btn btn-primary">保存规划 LLM 配置</button>
+          </form>
+        </div>
+      </section>
+      <section class="admin-section" id="promptOptimizeRecordsSection">
+        <h2>描述优化记录</h2>
+        <p class="settings-hint">来自审计日志的「优化描述」调用记录（不含用户原始输入全文）。</p>
+        <div class="admin-audit-toolbar">
+          <label>用户 ID
+            <input type="text" id="optimizeRecordsUserId" placeholder="留空显示全部" autocomplete="off">
+          </label>
+          <label>
+            状态
+            <select id="optimizeRecordsLevel">
+              <option value="">全部</option>
+              <option value="info">成功</option>
+              <option value="error">失败</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-outline btn-sm" id="optimizeRecordsRefreshBtn">刷新</button>
+        </div>
+        <p class="admin-sessions-meta" id="optimizeRecordsMeta"></p>
+        <div id="optimizeRecordsTable" class="admin-table">加载中…</div>
+        <div class="admin-audit-pagination">
+          <button type="button" class="btn btn-outline btn-sm" id="optimizeRecordsPrevBtn">上一页</button>
+          <span id="optimizeRecordsPageInfo"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="optimizeRecordsNextBtn">下一页</button>
+        </div>
+      </section>
+      <section class="admin-section" id="defaultRequirementsSection">
+        <h2>默认「其他要求」配置</h2>
+        <p class="settings-hint">影响新用户首次列表及主页「恢复默认」；不覆盖用户已保存在浏览器 localStorage 的自定义项。</p>
+        <p class="admin-sessions-meta" id="defaultRequirementsMeta"></p>
+        <p class="modal-req-sort-hint">拖动左侧手柄可调整顺序（保存到服务器后生效）</p>
+        <ul class="modal-req-list" id="defaultRequirementsList"></ul>
+        <p class="settings-hint" id="defaultRequirementsListEmpty" hidden>暂无默认项，可在下方添加。</p>
+        <form id="defaultRequirementForm" class="admin-form">
+          <input type="hidden" id="defaultReqEditId" value="">
+          <label>标题 <span class="form-hint">（最多 8 个汉字）</span>
+            <input type="text" id="defaultReqTitle" maxlength="32" placeholder="例如：多语言支持">
+          </label>
+          <span class="form-counter" id="defaultReqTitleCounter">0/8 汉字</span>
+          <label>详细说明
+            <textarea id="defaultReqDescription" rows="3"></textarea>
+          </label>
+          <label>Agent 指令 <span class="form-hint">（可选，留空则使用详细说明代替）</span>
+            <textarea id="defaultReqPrompt" rows="2" placeholder="供 Agent 理解的额外约束…"></textarea>
+          </label>
+          <label>开销提示
+            <select id="defaultReqCost">
+              <option value="low">低</option>
+              <option value="medium" selected>中</option>
+              <option value="high">高</option>
+              <option value="unknown">未知</option>
+            </select>
+          </label>
+          <label><input type="checkbox" id="defaultReqEnabled" checked> 默认启用</label>
+          <div class="modal-form-actions">
+            <button type="button" class="btn btn-outline btn-sm" id="defaultReqCancelBtn" hidden>取消编辑</button>
+            <button type="button" class="btn btn-primary btn-sm" id="defaultReqAddBtn">添加项</button>
+          </div>
+        </form>
+        <div class="admin-audit-toolbar" style="margin-top: 0.75rem;">
+          <button type="button" class="btn btn-outline btn-sm" id="defaultReqRestoreBuiltinBtn">恢复内置默认</button>
+          <button type="button" class="btn btn-primary btn-sm" id="defaultReqSaveBtn">保存到服务器</button>
+        </div>
+      </section>
+      <section class="admin-section">
+        <h2>站点设置</h2>
+        <form id="settingsForm" class="admin-form">
+          <label><input type="checkbox" id="registrationEnabled"> 开放注册</label>
+          <label><input type="checkbox" id="sharedLlmEnabled"> 使用统一 LLM API（全站用户共用上方配置）</label>
+          <label><input type="checkbox" id="betaBannerEnabled"> 显示封闭测试横幅</label>
+          <label>横幅文案<textarea id="betaBannerText" rows="2"></textarea></label>
+          <label>反馈邮箱<input type="email" id="feedbackEmail"></label>
+          <button type="submit" class="btn btn-primary">保存站点设置</button>
+        </form>
+      </section>
+      <section class="admin-section">
+        <h2>用户</h2>
+        <div id="usersTable" class="admin-table">加载中…</div>
+      </section>
+      <section class="admin-section" id="plansSection">
+        <h2>规划</h2>
+        <div class="admin-sessions-toolbar">
+          <label class="admin-sessions-search">
+            搜索
+            <input type="search" id="plansSearch" placeholder="标题、规划 ID、用户名或邮箱" autocomplete="off">
+          </label>
+          <label>
+            状态
+            <select id="plansStatusFilter">
+              <option value="">全部</option>
+              <option value="awaiting_l1">待完成问卷</option>
+              <option value="active">进行中</option>
+              <option value="ready">可定稿</option>
+              <option value="finalized">已定稿</option>
+              <option value="handed_off">已移交编写</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-outline btn-sm" id="plansRefreshBtn">刷新</button>
+        </div>
+        <p class="admin-sessions-meta" id="plansMeta"></p>
+        <div id="plansTable" class="admin-table">加载中…</div>
+        <div class="admin-sessions-pagination">
+          <button type="button" class="btn btn-outline btn-sm" id="plansPrevBtn">上一页</button>
+          <span id="plansPageInfo"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="plansNextBtn">下一页</button>
+        </div>
+      </section>
+      <section class="admin-section" id="sessionsSection">
+        <h2>会话</h2>
+        <div class="admin-sessions-toolbar">
+          <label class="admin-sessions-search">
+            搜索
+            <input type="search" id="sessionsSearch" placeholder="标题、会话 ID、用户名或邮箱" autocomplete="off">
+          </label>
+          <label>
+            状态
+            <select id="sessionsStatusFilter">
+              <option value="">全部</option>
+              <option value="running">编写中</option>
+              <option value="starting">启动中</option>
+              <option value="waiting_user">等待用户</option>
+              <option value="completed">已完成</option>
+              <option value="stopped">已停止</option>
+              <option value="error">错误</option>
+              <option value="interrupted">已中断</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-outline btn-sm" id="sessionsRefreshBtn">刷新</button>
+        </div>
+        <p class="admin-sessions-meta" id="sessionsMeta"></p>
+        <div id="sessionsTable" class="admin-table">加载中…</div>
+        <div class="admin-sessions-pagination">
+          <button type="button" class="btn btn-outline btn-sm" id="sessionsPrevBtn">上一页</button>
+          <span id="sessionsPageInfo"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="sessionsNextBtn">下一页</button>
+        </div>
+      </section>
+      <section class="admin-section">
+        <h2>操作日志</h2>
+        <div class="admin-audit-toolbar">
+          <label>分类
+            <select id="auditCategory">
+              <option value="">全部</option>
+              <option value="session">session</option>
+              <option value="agent">agent</option>
+              <option value="auth">auth</option>
+              <option value="admin">admin</option>
+              <option value="prompt">prompt</option>
+              <option value="user">user</option>
+              <option value="http">http</option>
+              <option value="artifact">artifact</option>
+              <option value="system">system</option>
+            </select>
+          </label>
+          <label>会话 ID<input type="text" id="auditSessionId" placeholder="sess-…"></label>
+          <button type="button" class="btn btn-outline btn-sm" id="auditRefreshBtn">刷新</button>
+        </div>
+        <div id="auditLogsTable" class="admin-table">加载中…</div>
+        <div class="admin-audit-pagination">
+          <button type="button" class="btn btn-outline btn-sm" id="auditPrevBtn">上一页</button>
+          <span id="auditPageInfo"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="auditNextBtn">下一页</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

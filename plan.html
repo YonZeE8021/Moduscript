@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Moduscript 模词成稿 — 规划模式">
+  <meta name="google" content="notranslate">
+  <title>规划模式 · Moduscript 模词成稿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=38">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" defer></script>
+</head>
+<body class="plan-page">
+  <div class="app-layout" id="appLayout">
+    <aside class="history-panel unified-sidebar" id="historyPanel" aria-label="侧栏" hidden>
+      <div class="sidebar-section sidebar-section--sessions">
+        <div class="history-panel-header">
+          <h2 class="history-panel-title" id="historyPanelTitle">对话列表</h2>
+          <button type="button" class="btn btn-outline btn-sm" id="conceptNewBtn">新建构想</button>
+        </div>
+        <div class="history-panel-body" id="historyPanelBody">
+          <p class="history-panel-empty">暂无记录</p>
+        </div>
+        <div class="history-panel-footer">
+          <button type="button" class="btn btn-outline btn-sm history-panel-recycle-btn" id="historyRecycleBtn">回收站</button>
+        </div>
+      </div>
+    </aside>
+    <div class="history-backdrop" id="historyBackdrop" hidden aria-hidden="true"></div>
+
+    <div class="main-column plan-main-column">
+      <header class="top-bar plan-top-bar">
+        <button type="button" class="top-bar-btn history-toggle" id="historyToggle" aria-expanded="false" aria-controls="historyPanel">
+          <span class="top-bar-btn-label">对话列表</span>
+        </button>
+        <div class="top-bar-spacer"></div>
+        <button type="button" class="btn btn-primary" id="planFinalizeBtn">结束规划并编写</button>
+      </header>
+
+      <div class="plan-admin-banner" id="planAdminBanner" hidden>
+        <span id="planAdminBannerText">管理员只读查看</span>
+      </div>
+
+      <main class="plan-main">
+        <div class="plan-header">
+          <h1 class="plan-title" id="planTaskTitle">规划模式</h1>
+          <div class="plan-header-meta">
+            <span class="plan-difficulty" id="planDifficulty">难度：—</span>
+            <span class="plan-processing" id="planProcessing" hidden>处理中…</span>
+          </div>
+          <div class="plan-readiness" id="planReadiness" hidden></div>
+        </div>
+
+        <div class="plan-layout">
+          <section class="plan-panel plan-panel--history" aria-label="对话历史">
+            <h2 class="plan-panel-title">对话历史</h2>
+            <div class="plan-history" id="planHistory"></div>
+          </section>
+
+          <section class="plan-panel plan-panel--tree" aria-label="方案树">
+            <div class="plan-panel-title-row">
+              <h2 class="plan-panel-title">方案树 <span class="plan-tree-snapshot-badge" id="planTreeSnapshotBadge" hidden></span></h2>
+              <div class="plan-tree-view-toggle" role="tablist">
+                <button type="button" class="plan-tree-view-btn is-active" id="planTreeViewList" role="tab">列表</button>
+                <button type="button" class="plan-tree-view-btn" id="planTreeViewGraph" role="tab">导图</button>
+              </div>
+            </div>
+            <div class="plan-tree" id="planTree"></div>
+            <div class="plan-tree-graph-wrap" id="planTreeGraphWrap" hidden>
+              <svg class="plan-tree-svg" id="planTreeSvg" aria-label="方案树导图"></svg>
+            </div>
+          </section>
+        </div>
+
+        <section class="plan-current" aria-label="当前轮次">
+          <h2 class="plan-panel-title">当前分析 <span class="plan-current-turn-badge" id="planCurrentTurnBadge" hidden></span></h2>
+          <p class="plan-assistant-message" id="planAssistantMessage"></p>
+          <div class="plan-questions" id="planQuestions"></div>
+        </section>
+
+        <footer class="plan-page-footer" aria-label="规划上下文摘要">
+          <div class="plan-footer-section" id="planContextBody"></div>
+          <div class="plan-footer-section" id="planReferenceBody"></div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="plan-modal-overlay" id="planL1Overlay" hidden>
+    <div class="plan-modal" role="dialog" aria-labelledby="planL1Title">
+      <h2 class="plan-modal-title" id="planL1Title">知识水平（L1 四维粗评）</h2>
+      <div class="plan-modal-body" id="planL1Body"></div>
+      <div class="plan-modal-actions">
+        <button type="button" class="btn btn-outline" id="planL1Cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="planL1Save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-modal-overlay" id="planFinalizeOverlay" hidden>
+    <div class="plan-modal plan-modal--wide" role="dialog" aria-labelledby="planFinalizeTitle">
+      <h2 class="plan-modal-title" id="planFinalizeTitle">确认规划并进入编写</h2>
+      <div class="plan-modal-body plan-finalize-preview" id="planFinalizePreview"></div>
+      <div class="plan-modal-actions">
+        <button type="button" class="btn btn-outline" id="planFinalizeCancel">继续规划</button>
+        <button type="button" class="btn btn-outline" id="planFinalizeRegenerate">重新生成</button>
+        <button type="button" class="btn btn-primary" id="planFinalizeConfirm">确认并开始编写</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/plan-preview.js"></script>
+</body>
+</html>

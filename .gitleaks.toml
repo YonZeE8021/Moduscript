@@ -1,0 +1,9 @@
+title = "Moduscript gitleaks config"
+
+[allowlist]
+description = "Example placeholders and deploy templates"
+paths = [
+  '''\.env\.example$''',
+  '''deploy/keys/psk\.hex\.example$''',
+  '''server/config\.py$''',
+]

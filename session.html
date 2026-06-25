@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Moduscript 模词成稿 — 编写中">
+  <meta name="google" content="notranslate">
+  <title>编写中 · Moduscript 模词成稿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=31">
+</head>
+<body class="session-page">
+  <div class="app-layout" id="appLayout">
+    <aside class="history-panel unified-sidebar" id="historyPanel" aria-label="侧栏" hidden>
+      <div class="sidebar-section sidebar-section--sessions">
+        <div class="history-panel-header">
+          <h2 class="history-panel-title" id="historyPanelTitle">对话列表</h2>
+          <button type="button" class="btn btn-outline btn-sm" id="conceptNewBtn">新建构想</button>
+        </div>
+        <div class="history-panel-body" id="historyPanelBody">
+          <p class="history-panel-empty">暂无记录</p>
+        </div>
+        <div class="history-panel-footer">
+          <button type="button" class="btn btn-outline btn-sm history-panel-recycle-btn" id="historyRecycleBtn">回收站</button>
+        </div>
+      </div>
+    </aside>
+    <div class="history-backdrop" id="historyBackdrop" hidden aria-hidden="true"></div>
+
+    <div class="main-column session-main-column">
+      <main class="session-main-content">
+        <div class="session-scroll" id="sessionScroll">
+      <header class="top-bar session-top-bar" id="sessionTopBar">
+        <div class="session-top-bar-inner" id="sessionTopBarInner" title="点击切换顶栏毛玻璃效果">
+          <div class="session-top-bar-start">
+            <button
+              type="button"
+              class="top-bar-btn history-toggle"
+              id="historyToggle"
+              aria-expanded="false"
+              aria-controls="historyPanel"
+            >
+              <svg class="history-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+              <span class="top-bar-btn-label">对话列表</span>
+              <svg class="history-toggle-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="session-hero" aria-label="会话概览">
+            <p class="session-site-brand">Moduscript 模词成稿</p>
+            <div class="session-hero-title-row">
+              <h1 class="session-hero-title" id="sessionTaskTitle">加载中…</h1>
+              <input type="text" class="session-hero-title-input" id="sessionTaskTitleInput" maxlength="80" aria-label="任务名称" hidden>
+              <button type="button" class="session-title-edit-btn" id="sessionTitleEditBtn" aria-label="编辑任务名称">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </button>
+            </div>
+            <p class="session-hero-meta">
+              <span class="session-status-badge" id="sessionStatus">连接中…</span>
+              <span class="session-stage-text" id="sessionStageText">—</span>
+              <span class="session-env-chips" id="sessionEnvChips" aria-label="任务环境"></span>
+            </p>
+          </div>
+          <div class="session-top-bar-end">
+            <div class="session-top-bar-groups">
+              <div class="top-bar-actions session-top-bar-group session-top-bar-group--project" id="topBarProjectGroup" aria-label="项目管理">
+                <button type="button" class="top-bar-btn top-bar-btn--project" id="topBarDownloadJar" disabled>下载模组 jar</button>
+                <div class="session-test-server-control" id="topBarTestServerControl" hidden aria-hidden="true">
+                  <button type="button" class="top-bar-btn top-bar-btn--project" id="topBarStartTestServer" disabled hidden title="即将推出">启动测试服务器</button>
+                  <div class="session-test-server-submenu" id="topBarTestServerSubmenu" hidden>
+                    <button type="button" class="top-bar-btn top-bar-btn--sub" id="topBarStopTestServer">关闭服务器</button>
+                    <button type="button" class="top-bar-btn top-bar-btn--sub" id="topBarCopyServerAddr">复制地址</button>
+                  </div>
+                </div>
+                <button type="button" class="top-bar-btn top-bar-btn--project" id="topBarOpenFolder" disabled>查看项目文件夹</button>
+              </div>
+              <div class="top-bar-actions session-top-bar-group session-top-bar-group--general" id="topBarGeneralGroup" hidden aria-label="站点菜单">
+            <div class="nav-dropdown" data-nav-dropdown="tools">
+              <button type="button" class="top-bar-btn nav-dropdown-trigger" id="toolsMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="toolsMenu">
+                <span class="top-bar-btn-label">其他工具</span>
+                <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <ul class="nav-dropdown-menu" id="toolsMenu" role="menu" aria-labelledby="toolsMenuTrigger" hidden>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-search">模组查找</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-source">模组源码分析</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="mod-redev">模组二次开发</button></li>
+              </ul>
+            </div>
+            <div class="nav-dropdown" data-nav-dropdown="help">
+              <button type="button" class="top-bar-btn nav-dropdown-trigger" id="helpMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="helpMenu">
+                <span class="top-bar-btn-label">帮助&amp;客服</span>
+                <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <ul class="nav-dropdown-menu" id="helpMenu" role="menu" aria-labelledby="helpMenuTrigger" hidden>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="help-docs">使用说明</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="help-support">联系客服</button></li>
+              </ul>
+            </div>
+            <div class="nav-dropdown" data-nav-dropdown="lang">
+              <button type="button" class="top-bar-btn nav-dropdown-trigger" id="langMenuTrigger" aria-haspopup="menu" aria-expanded="false" aria-controls="langMenu">
+                <span class="top-bar-btn-label">语言切换</span>
+                <svg class="nav-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <ul class="nav-dropdown-menu" id="langMenu" role="menu" aria-labelledby="langMenuTrigger" hidden>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="lang-zh" aria-current="true">简体中文</button></li>
+                <li role="none"><button type="button" class="nav-dropdown-item" role="menuitem" data-nav-action="lang-en">English</button></li>
+              </ul>
+            </div>
+              </div>
+            </div>
+            <div class="top-bar-account-col">
+              <button type="button" class="btn-icon theme-toggle" id="themeToggle" aria-label="切换主题">
+                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+              </button>
+              <a class="account-status" id="accountStatus" href="/login.html">游客，请登录</a>
+            </div>
+            <button
+              type="button"
+              class="session-toolbar-switch"
+              id="topBarToolbarSwitch"
+              data-toolbar-panel="project"
+              aria-label="当前：项目管理，切换到站点菜单"
+              title="当前：项目管理，切换到站点菜单"
+            >
+              <span class="session-toolbar-switch-state" id="topBarToolbarSwitchState">项目</span>
+              <svg class="session-toolbar-switch-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+          <div id="sessionAdminBanner" class="session-admin-banner" hidden>
+            <span id="sessionAdminBannerText">管理员只读查看</span>
+            <div class="session-admin-banner-actions">
+              <button type="button" id="sessionAdminInterveneBtn" class="btn btn-outline btn-sm session-admin-intervene-btn">介入编辑</button>
+              <a class="session-admin-banner-link" href="/admin.html">← 返回管理后台</a>
+            </div>
+          </div>
+
+          <div id="sessionMessages" class="session-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        </div>
+
+        <footer class="session-compose-footer">
+          <div id="sessionSetupNotice" class="session-setup-notice" hidden role="status" aria-live="polite"></div>
+          <div class="session-compose-row">
+            <textarea class="session-compose-input" id="sessionComposeInput" rows="2" placeholder="连接会话中…" disabled></textarea>
+            <div class="session-compose-actions">
+              <button type="button" class="btn btn-outline btn-sm" id="sessionStopBtn" disabled>停止</button>
+              <button type="button" class="btn btn-primary btn-sm" id="sessionSendBtn" disabled>发送</button>
+            </div>
+          </div>
+          <p class="session-compose-hint" id="sessionComposeHint">正在连接会话…</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="modal-overlay" id="projectFilesOverlay" hidden>
+    <div
+      class="modal modal--wide workspace-browser-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="workspaceBrowserTitle"
+    >
+      <div class="modal-header workspace-browser-header">
+        <div class="workspace-browser-header-main">
+          <h2 class="modal-title" id="workspaceBrowserTitle">项目文件</h2>
+          <p class="workspace-server-path" id="workspaceServerPath" title="服务器上的工作区路径"></p>
+        </div>
+        <div class="workspace-browser-header-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="workspaceCopyPath">复制路径</button>
+          <button type="button" class="btn btn-outline btn-sm" id="workspaceRefresh">刷新</button>
+          <button type="button" class="modal-close" id="workspaceBrowserClose" aria-label="关闭">×</button>
+        </div>
+      </div>
+      <div class="modal-body workspace-browser-body">
+        <nav class="workspace-breadcrumb" id="workspaceBreadcrumb" aria-label="当前路径"></nav>
+        <p class="workspace-list-meta" id="workspaceListMeta"></p>
+        <div class="workspace-browser-panels">
+          <div class="workspace-file-list-wrap">
+            <div class="workspace-file-list" id="workspaceFileList" role="list"></div>
+          </div>
+          <div class="workspace-file-preview" id="workspaceFilePreview">
+            <p class="workspace-preview-placeholder">选择文件以预览内容</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer workspace-browser-footer">
+        <button type="button" class="btn btn-outline btn-sm" id="workspaceGoUp">返回上级</button>
+        <button type="button" class="btn btn-outline btn-sm" id="workspaceDownloadFile" disabled>下载当前文件</button>
+        <button type="button" class="btn btn-primary btn-sm" id="workspaceDownloadFolder">下载当前文件夹 (zip)</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/session-preview.js"></script>
+</body>
+</html>

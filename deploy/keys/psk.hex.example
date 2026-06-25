@@ -1,0 +1,4 @@
+# Replace this file with a 64-character hex pre-shared key for deploy authentication.
+# Generate: python -c "import secrets; print(secrets.token_hex(32))"
+# Copy to psk.hex on both sender and receiver machines (deploy/keys/psk.hex).
+0000000000000000000000000000000000000000000000000000000000000000

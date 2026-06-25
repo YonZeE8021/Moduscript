@@ -1,0 +1,6 @@
+{
+  "host": "127.0.0.1",
+  "port": 9001,
+  "project_root": "..",
+  "connect_timeout_sec": 30
+}

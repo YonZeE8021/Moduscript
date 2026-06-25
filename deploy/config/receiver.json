@@ -1,0 +1,13 @@
+{
+  "listen_host": "127.0.0.1",
+  "listen_port": 9001,
+  "deploy_root": "..",
+  "auto_pip": true,
+  "auto_restart": true,
+  "server_port": 8000,
+  "venv_python": ".venv/Scripts/python.exe",
+  "start_cmd_linux": [
+    ".venv/bin/python",
+    "main.py"
+  ]
+}

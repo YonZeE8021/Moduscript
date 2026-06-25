@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · Moduscript 模词成稿</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1 class="auth-title">登录 Moduscript</h1>
+    <p class="auth-subtitle">为保障个人数据独立，请登录</p>
+    <form id="loginForm" class="auth-form">
+      <label class="auth-label">账号<input type="text" id="account" required autocomplete="username" placeholder="用户名或邮箱"></label>
+      <label class="auth-label">密码<input type="password" id="password" required autocomplete="current-password" minlength="6"></label>
+      <button type="submit" class="btn btn-primary auth-submit">登录</button>
+    </form>
+    <p class="auth-footer">还没有账号？<a href="/register.html">免费注册</a></p>
+  </main>
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { login } from './js/auth.js';
+
+    function showToast(msg, type = 'info') {
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next') || '/index.html';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const account = document.getElementById('account').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        await login(account, password);
+        window.location.href = next;
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  </script>
+</body>
+</html>
